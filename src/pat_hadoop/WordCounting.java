@@ -33,12 +33,22 @@ public class WordCounting {
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             StringTokenizer itr = new StringTokenizer(value.toString());
+            Text article = new Text ("article");
+            Text inproceedings = new Text ("inproceedings");
+            Text phdthesis = new Text ("phdthesis");
+            Text masterthesis = new Text ("masterthesis");
+            
             while (itr.hasMoreTokens()) {
                 String category = itr.nextToken();
-                if ((category.equals("article")) || (category.equals("inproceedings")) || (category.equals("phdthesis")) || (category.equals("masterthesis"))) {
-                    word.set(itr.nextToken());
-                    context.write(word, one);
-                }
+                word.set(itr.nextToken());
+                if (word.equals(article))
+                    context.write(article, one);
+                else if (word.equals(inproceedings))
+                    context.write(inproceedings, one);
+                else if (word.equals(phdthesis))
+                    context.write(phdthesis, one);
+                else if (word.equals(masterthesis))
+                    context.write(masterthesis, one);
             }
         }
     }
@@ -47,12 +57,12 @@ public class WordCounting {
         private IntWritable result = new IntWritable();
 
         public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
-          int sum = 0;
-          for (IntWritable val : values) {
-            sum += val.get();
-          }
-          result.set(sum);
-          context.write(key, result);
+            int sum = 0;            
+            for (IntWritable val : values) {
+                sum += val.get();
+            }
+            result.set(sum);
+            context.write(key, result);
         }
     }
     
